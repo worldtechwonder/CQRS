@@ -1,0 +1,39 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+thead td {
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.schedule-time {
+    background-color: #333;
+    color: #fff;
+}
+
+.schedule-status-available {
+    background-color: white;
+}
+
+.schedule-status-taken {
+    background-color: red;
+    color: #ddd;
+}
+
+.schedule-status-taken-more {
+    background-color: red;
+    border-top: solid 1px #ffb6c1!important;
+    color: #eee;
+}
+ 
+.schedule-status-taken-border {
+    border-top: solid 4px #222!important;
+    color: #f89;
+}

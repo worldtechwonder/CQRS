@@ -1,0 +1,2 @@
+In order to run the demo, you should only restore the packages. 
+Note also that the web.config file has a connection string that points to a local instance of SQL Server. If you don't have a local SQL Server, or don't want to use it, just modify the connection string to point to LocalDB or SQLExpress. The instance of SQL Server only serves the purpose of denormalizers. In alternative, you can also comment out denormalizer classes in the project.

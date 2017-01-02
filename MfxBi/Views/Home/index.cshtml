@@ -1,0 +1,41 @@
+﻿
+<div style="margin: 30px">
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#home" role="tab" data-toggle="tab">
+                <h3>Home</h3>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#manager" role="tab" data-toggle="tab">
+                <h3>Dashboard</h3>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#setup" role="tab" data-toggle="tab">
+                <h3>Setup</h3>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content" style="margin: 30px">
+        <div role="tabpanel" class="tab-pane active" id="home">
+            @Html.Partial("pv_Schedule")
+        </div>
+        <div role="tabpanel" class="tab-pane" id="manager">
+            <h1>DASHBOARD</h1>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="setup">
+
+            <p>Populate the grid with fake bookings</p>
+            <a href="#" role="button" class="btn btn-lg btn-primary">Seed</a>
+            
+            <p>Create default room(s) and related configurations</p>
+            <a href="@Url.Action("room", "setup")" role="button" class="btn btn-lg btn-primary">Rooms</a>
+        </div>
+    </div>
+
+</div>

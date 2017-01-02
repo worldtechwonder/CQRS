@@ -1,0 +1,72 @@
+﻿@model BankDemo.Models.NewAccountRequestViewModel
+
+<h2>NEW ACCOUNT</h2>
+
+<div class="container" style="margin-top:50px;">
+    <fieldset>
+        <legend>Make a request</legend>
+        <form method="POST" id="form">
+            <input type="hidden" name="connectionId" id="connectionId" />
+
+            <div class="form-group">
+                <label for="FullName">Customer's Name</label>
+                <input type="text" 
+                       class="form-control input-lg" 
+                       id="FullName" name="FullName" 
+                       placeholder="Customer name"
+                       value="@Model.FullName">
+            </div>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="range"
+                       min="18" max="99"
+                       class="form-control input-lg"
+                       id="age" name="age"
+                       placeholder="Age"
+                       value="@Model.Age">
+            </div>
+
+            <div class="form-group">
+                <label for="isnew" class="input-lg">
+                    New customer
+                    @Html.CheckBox("IsNew", Model.IsNew)
+                </label>
+            </div>
+            <div class="form-group" style="margin-top: 50px;">
+                <button type="button" class="btn btn-lg btn-primary"
+                        onclick="__sendRequest()">Request</button>
+            </div>
+        </form>
+    </fieldset>
+    
+    <hr/>
+    
+    <ul id="listOfEvents">
+        
+    </ul>
+</div>
+
+<script>
+    function __sendRequest() {
+        var data = $("#form").serialize();
+        $.post("/request/apply", data);
+    }
+</script>
+
+<script>
+    $(function () {
+        // Save  the reference to the SignalR hub
+        var theHub = $.connection.accountRequestHub;
+
+        // List functions to be called back from the server
+        // when required by server-side processing
+        theHub.client.requestReceived = function (requestId) {
+            $("#listOfEvents").append("<li><b>REQUEST RECEIVED</b> <br>" + requestId + "</li>");
+        };
+
+        // Start the SignalR client-side listener
+        $.connection.hub.start().done(function () {
+            $("#connectionId").val($.connection.hub.id);
+        });
+    });
+</script>

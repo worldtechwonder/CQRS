@@ -1,0 +1,30 @@
+﻿@model MfxBi.Models.DashboardViewModel
+
+<h1>PENDING REQUESTS</h1>
+
+<table class="table table-condensed">
+    @if (!Model.PendingBookings.Any())
+    {
+        <p>No pending requests.</p>
+    }
+    else
+    {
+        foreach (var req in Model.PendingBookings)
+        {
+            <tr>
+                <td><b>@req.DisplayName</b><br/><small>@req.RequestId</small></td>
+                <td>@req.Category</td>
+                <td>@req.Status</td>
+                <td>
+                    <a href="/dashboard/more/@req.RequestId" role="button" class="btn btn-info">MORE</a>
+
+                    @*<button class="btn btn-success" style="margin-left: 40px">APPROVE</button>*@
+                    <a href="/dashboard/approve/@req.RequestId" role="button" class="btn btn-success">APPROVE</a>
+                    <button class="btn btn-danger">DENY</button>
+                </td>
+            </tr>
+        }
+    }
+
+</table>
+

@@ -1,0 +1,200 @@
+﻿@model MfxBi.Models.HomeViewModel
+
+<div class="col-xs-12 well well-sm text-center text-uppercase">
+    <div class="col-xs-6">
+        <h3>@Model.Room.Name</h3>
+    </div>
+    <div class="col-xs-4">
+        <div class="input-group">
+            <input type="text" id="when" name="when"
+                   class="input-lg form-control"
+                   style="cursor:default"
+                   value="@Model.DayOfSchedule.ToString("MM-dd-yyyy")" />
+            <span class="input-group-btn">
+                <a role="button" 
+                   id="when-button"
+                   href="#"
+                class="btn btn-lg btn-primary">SEARCH</a>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="col-xs-6 col-xs-offset-0 col-sm-5 col-sm-offset-1">
+    <table class="table table-condensed">
+
+        <thead>
+            <tr>
+                <td>TIME</td>
+                <td colspan="2">STATUS</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.Items)
+            {
+                var hourDisplay = String.Format("{0:D2}:{1:D2}", s.Hour, s.Mins);
+                var statusCss = s.IsAvailable
+                    ? "schedule-status-available"
+                    : (s.IsFirstSlotOfBooking ? "schedule-status-taken" : "schedule-status-taken-more");
+                var trStatus = (!s.IsAvailable && s.IsFirstSlotOfBooking ? "schedule-status-taken-border" : ""); 
+                    
+                <tr class="@trStatus">
+                    <td class="schedule-time">@hourDisplay</td>
+                    <td style="width:50%" class="@statusCss">
+                        <div>
+                            @if (!s.IsAvailable)
+                            {
+                                <span>@s.Text</span>
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        @if (!s.IsAvailable)
+                        {
+                            if (s.IsFirstSlotOfBooking)
+                            {
+                                <button data-id="@s.CurrentBooking.BookingId"
+                                        data-hour="@s.Hour" data-mins="@s.Mins"
+                                        class="btn btn-warning btn-xs scheduler-button-move">
+                                    MOVE
+                                </button>
+                                <button data-id="@s.CurrentBooking.BookingId"
+                                        data-hour="@s.Hour" data-mins="@s.Mins"
+                                        class="btn btn-warning btn-xs scheduler-button-cancel">
+                                    CANCEL
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            <button data-hour="@s.Hour" data-mins="@s.Mins"
+                                    class="btn btn-success btn-xs scheduler-button-open">
+                                BOOK
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+
+    </table>
+</div>
+
+<div id="scheduler" class="col-xs-6 col-xs-offset-0 col-sm-5 col-sm-offset-1" style="display:none; border: solid 2px; padding:5px ">
+    <div>
+        <h3>BOOK from <span class="text-primary" id="time"></span></h3>
+        <form method="post" action="@Url.Action("add", "booking")">
+            <input type="hidden" name="hour" id="hour" />
+            <input type="hidden" name="mins" id="mins" />
+            <input type="hidden" name="roomid" id="roomid" value="@Model.Room.Id" />
+            <div class="form-group">
+                <label for="numberofslots">DURATION</label>
+                <select class="form-control" id="numberofslots" name="numberofslots">
+                    <option value="1">One slot</option>
+                    <option value="2">Two slots</option>
+                    <option value="0">As long as possible</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fullname">USER</label>
+                <input class="form-control text-capitalize" id="fullname" name="fullname" placeholder="Name of the user" />
+            </div>
+            <button type="submit" class="btn btn-danger scheduler-button-close" style="margin-top: 20px">PROCEED</button>
+            <button type="button" class="btn btn-default scheduler-button-close pull-right" style="margin-top: 20px">CLOSE</button>
+        </form>
+
+    </div>
+</div>
+
+<div id="mover" class="col-xs-6 col-xs-offset-0 col-sm-5 col-sm-offset-1" style="display:none; border: solid 2px; padding:5px ">
+    <div>
+        <dl class="dl-horizontal">
+            <dt>BOOKING</dt>
+            <dd><span id="displayBookingId"></span></dd>
+            <dt>ROOM <span id="displayBookingRoomId">?</span></dt>
+            <dd><span id="displayOriginalTime"></span></dd>
+        </dl>
+
+        <h3>
+            PUSHING 
+            <span id="moveToDays"> </span>
+            DAYS FORWARD
+            <button onclick="__random()">CHANGE</button>
+        </h3>
+        
+        <form method="post" action="@Url.Action("move", "booking")">
+            <input type="hidden" name="hour" id="hour" />
+            <input type="hidden" name="mins" id="mins" />
+            <input type="hidden" name="roomid" value="@Model.Room.Id" />
+            <input type="hidden" name="bookingid" id="bookingId" />
+            <input type="hidden" name="shift" id="shift" />
+
+            <button type="submit" class="btn btn-danger scheduler-button-close" style="margin-top: 20px">PROCEED</button>
+            <button type="button" class="btn btn-default scheduler-button-close pull-right" style="margin-top: 20px">CLOSE</button>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    $(".scheduler-button-open").click(function () {
+        var hh = $(this).data("hour");
+        var mm = $(this).data("mins");
+        $("#hour").val(hh);
+        $("#mins").val(mm);
+        var hhDisplay = ("00" + $(this).data("hour")).slice(-2);
+        var mmDisplay = ("00" + $(this).data("mins")).slice(-2);
+        $("#time").html(hhDisplay + ":" + mmDisplay);
+        $("#scheduler").show();
+    });
+    $(".scheduler-button-close").click(function () {
+        $("#scheduler").hide();
+        $("#mover").hide();
+    });
+    $("#when").datepicker();
+    $("#when-button").click(function() {
+        var date = $("#when").val();
+        window.location.href = Mfxbi.RootServer + "/home/index?day=" + date;
+    });
+
+    $(".scheduler-button-move").click(function () {
+        var hh = $(this).data("hour");
+        var mm = $(this).data("mins");
+        $("#hour").val(hh);
+        $("#mins").val(mm);
+        var hhDisplay = ("00" + $(this).data("hour")).slice(-2);
+        var mmDisplay = ("00" + $(this).data("mins")).slice(-2);
+
+        $("#bookingId").val($(this).data("id"));
+        $("#displayBookingId").html($(this).data("id"));
+        $("#displayBookingRoomId").html($("#roomid").val());
+        $("#displayOriginalTime").html(hhDisplay + ":" + mmDisplay);
+
+        // RANDOM day/time to move
+        __random();
+
+        $("#mover").show();
+    });
+
+    function __random() {
+        var max = 5;
+        var min = 1;
+        var dayShift = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        $("#shift").val(dayShift);
+        $("#moveToDays").html(Math.abs(dayShift)).css("color", "red");
+    }
+</script>
+
+<script>
+    $(".scheduler-button-cancel").click(function() {
+        var yes = confirm("Releasing the room.\nCONFIRM?");
+        if (yes) {
+            var date = $("#when").val();
+            var bid = $(this).data("id");
+            Mfxbi.post("/booking/cancel", { bid: bid }, function() {
+                window.location.href = Mfxbi.RootServer + "/home/index?day=" + date;
+            });
+        }
+    })
+</script>
